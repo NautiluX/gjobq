@@ -35,46 +35,46 @@ Create job struct and write decoder function
 ```golang
 // CustomJob will only sleep for a configurable amount of time
 type CustomJob struct {
-	Delay time.Duration
+  Delay time.Duration
 }
 
 // DecodeCustomJob is creates a instance of the job type from a byte array using gob
 func DecodeCustomJob(content []byte) jobq.JobType {
-   //your type here
-	var jobIncoming CustomJob
-  
+  //your type here
+  var jobIncoming CustomJob
+
   // start copying here
-	b := bytes.Buffer{}
-	b.Write(content)
-	d := gob.NewDecoder(&b)
-	err := d.Decode(&jobIncoming)
-	if err != nil {
-		log.Fatalf("failed decode job: %v", err)
-	}
-  
+  b := bytes.Buffer{}
+  b.Write(content)
+  d := gob.NewDecoder(&b)
+  err := d.Decode(&jobIncoming)
+  if err != nil {
+    log.Fatalf("failed decode job: %v", err)
+  }
+
   // return decoded object
-	return jobIncoming
+  return jobIncoming
 }
 
 // Process is the function that'll be called when a job is processed
 func (j CustomJob) Process() {
-	time.Sleep(j.Delay)
+  time.Sleep(j.Delay)
 }
 ```
 
 Register job type with decoder function
 
 ```golang
-	jobq.RegisterJob("MyCustomJob", DecodeCustomJob)
+jobq.RegisterJob("MyCustomJob", DecodeCustomJob)
 ```
 
 Parse Arguments and start Job queue
 
 ```golang
-	jobq.Flags()
-	flag.Parse()
-	mode := jobq.Start()
-	defer jobq.Stop()
+jobq.Flags()
+flag.Parse()
+mode := jobq.Start()
+defer jobq.Stop()
 ```
 
 Enqueue job
